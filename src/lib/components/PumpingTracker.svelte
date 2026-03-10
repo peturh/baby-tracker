@@ -4,10 +4,11 @@
 
 	interface Props {
 		lastEvent: TrackerEvent | null;
+		todaySessions: TrackerEvent[];
 		onLogged: () => void;
 	}
 
-	let { lastEvent, onLogged }: Props = $props();
+	let { lastEvent, todaySessions, onLogged }: Props = $props();
 
 	let loading = $state(false);
 	let showInput = $state(false);
@@ -16,6 +17,18 @@
 	let rightMl = $state(30);
 
 	let totalMl = $derived(leftMl + rightMl);
+
+	let todayTotals = $derived.by(() => {
+		let left = 0, right = 0;
+		for (const s of todaySessions) {
+			try {
+				const meta: PumpingMeta = JSON.parse(s.metadata);
+				left += meta.left_ml;
+				right += meta.right_ml;
+			} catch { /* ignore */ }
+		}
+		return { left, right, total: left + right, count: todaySessions.length };
+	});
 
 	function lastLabel(): string {
 		if (!lastEvent) return '';
@@ -64,6 +77,18 @@
 </script>
 
 <TrackerCard title="Pumping" icon="🥛" color="#7bc67e" {lastEvent} lastEventLabel={lastLabel()}>
+	{#if todayTotals.count > 0}
+		<div class="mb-3 px-1 space-y-1">
+			<div class="flex items-center justify-between">
+				<span class="text-xs text-gray-400">Today ({todayTotals.count} session{todayTotals.count !== 1 ? 's' : ''})</span>
+				<span class="text-sm font-bold text-baby-green">{todayTotals.total} ml</span>
+			</div>
+			<div class="flex gap-3 text-xs text-gray-400">
+				<span>L: {todayTotals.left} ml</span>
+				<span>R: {todayTotals.right} ml</span>
+			</div>
+		</div>
+	{/if}
 	{#if showInput}
 		<div class="space-y-3">
 			<div class="flex gap-3">

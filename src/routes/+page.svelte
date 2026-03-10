@@ -18,8 +18,8 @@
 	let localAppointments = $state<Appointment[] | null>(null);
 	let appointments = $derived(localAppointments ?? (data.appointments as Appointment[]));
 
-	let localTummyToday = $state<TrackerEvent[] | null>(null);
-	let tummyToday = $derived(localTummyToday ?? (data.tummyToday as TrackerEvent[]));
+	let localTodayEvents = $state<Record<string, TrackerEvent[]> | null>(null);
+	let todayEvents = $derived(localTodayEvents ?? (data.todayEvents as Record<string, TrackerEvent[]>));
 
 	const ORDER_KEY = 'baby-tracker-section-order';
 	const HIDDEN_KEY = 'baby-tracker-hidden-sections';
@@ -157,19 +157,24 @@
 
 		const todayStart = new Date();
 		todayStart.setHours(0, 0, 0, 0);
-		const todayTummy: TrackerEvent[] = [];
+		const todayByType: Record<string, TrackerEvent[]> = {
+			tummytime: [],
+			diaper: [],
+			nursing: [],
+			pumping: []
+		};
 
 		for (const event of events) {
 			if (!byType[event.type]) {
 				byType[event.type] = event;
 			}
-			if (event.type === 'tummytime' && new Date(event.created_at) >= todayStart) {
-				todayTummy.push(event);
+			if (event.type in todayByType && new Date(event.created_at) >= todayStart) {
+				todayByType[event.type].push(event);
 			}
 		}
 
 		localLatest = byType;
-		localTummyToday = todayTummy;
+		localTodayEvents = todayByType;
 	}
 
 	async function refreshAppointments() {
@@ -275,19 +280,19 @@
 	<main class="max-w-lg mx-auto px-4 pt-4 space-y-4">
 		{#each sectionOrder.filter((s) => !hiddenSections.has(s)) as section (section)}
 			{#if section === 'diaper'}
-				<DiaperTracker lastEvent={latest.diaper} onLogged={refresh} />
+				<DiaperTracker lastEvent={latest.diaper} todayCount={todayEvents.diaper?.length ?? 0} onLogged={refresh} />
 			{:else if section === 'nursing'}
-				<NursingTracker lastEvent={latest.nursing} onLogged={refresh} />
+				<NursingTracker lastEvent={latest.nursing} todayCount={todayEvents.nursing?.length ?? 0} onLogged={refresh} />
 			{:else if section === 'bottle'}
 				<BottleTracker lastEvent={latest.bottle} onLogged={refresh} />
 			{:else if section === 'pumping'}
-				<PumpingTracker lastEvent={latest.pumping} onLogged={refresh} />
+				<PumpingTracker lastEvent={latest.pumping} todaySessions={todayEvents.pumping ?? []} onLogged={refresh} />
 			{:else if section === 'sleep'}
 				<SleepTracker lastEvent={latest.sleep} onLogged={refresh} />
 			{:else if section === 'vitamind'}
 				<VitaminDTracker lastEvent={latest.vitamind} onLogged={refresh} />
 			{:else if section === 'tummytime'}
-				<TummyTimeTracker lastEvent={latest.tummytime} todaySessions={tummyToday} onLogged={refresh} />
+				<TummyTimeTracker lastEvent={latest.tummytime} todaySessions={todayEvents.tummytime ?? []} onLogged={refresh} />
 			{:else if section === 'appointments'}
 				<AppointmentsList {appointments} onChanged={refreshAppointments} />
 			{/if}

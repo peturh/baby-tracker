@@ -7,7 +7,9 @@ export const load: PageServerLoad = async () => {
 	const todayStart = new Date();
 	todayStart.setHours(0, 0, 0, 0);
 
-	const [eventResults, appointmentsResult, tummyTodayResult] = await Promise.all([
+	const todayTypes = ['tummytime', 'diaper', 'nursing', 'pumping'] as const;
+
+	const [eventResults, appointmentsResult, ...todayResults] = await Promise.all([
 		Promise.all(
 			types.map((type) =>
 				db.execute({
@@ -19,10 +21,12 @@ export const load: PageServerLoad = async () => {
 		db.execute(
 			`SELECT * FROM appointments WHERE datetime >= datetime('now') ORDER BY datetime ASC`
 		),
-		db.execute({
-			sql: `SELECT * FROM events WHERE type = 'tummytime' AND created_at >= ? ORDER BY created_at DESC`,
-			args: [todayStart.toISOString()]
-		})
+		...todayTypes.map((type) =>
+			db.execute({
+				sql: `SELECT * FROM events WHERE type = ? AND created_at >= ? ORDER BY created_at DESC`,
+				args: [type, todayStart.toISOString()]
+			})
+		)
 	]);
 
 	const latest: Record<string, ReturnType<typeof serialize> | null> = {};
@@ -38,9 +42,12 @@ export const load: PageServerLoad = async () => {
 		purpose: row.purpose as string
 	}));
 
-	const tummyToday = tummyTodayResult.rows.map(serialize);
+	const todayEvents: Record<string, ReturnType<typeof serialize>[]> = {};
+	todayTypes.forEach((type, i) => {
+		todayEvents[type] = todayResults[i].rows.map(serialize);
+	});
 
-	return { latest, appointments, tummyToday };
+	return { latest, appointments, todayEvents };
 };
 
 function serialize(row: Record<string, unknown>) {

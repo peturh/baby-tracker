@@ -4,10 +4,11 @@
 
 	interface Props {
 		lastEvent: TrackerEvent | null;
+		todayCount: number;
 		onLogged: () => void;
 	}
 
-	let { lastEvent, onLogged }: Props = $props();
+	let { lastEvent, todayCount, onLogged }: Props = $props();
 
 	let loading = $state(false);
 	let showOptions = $state(false);
@@ -61,6 +62,12 @@
 </script>
 
 <TrackerCard title="Diaper" icon="🧷" color="#6bb7e0" {lastEvent} lastEventLabel={lastLabel()}>
+	{#if todayCount > 0}
+		<div class="flex items-center justify-between mb-3 px-1">
+			<span class="text-xs text-gray-400">Today</span>
+			<span class="text-sm font-bold text-baby-blue">{todayCount} diaper{todayCount !== 1 ? 's' : ''}</span>
+		</div>
+	{/if}
 	{#if showOptions}
 		<div class="space-y-3">
 			<div class="flex gap-2">
