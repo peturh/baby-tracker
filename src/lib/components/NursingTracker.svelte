@@ -5,12 +5,13 @@
 	interface Props {
 		lastEvent: TrackerEvent | null;
 		todayCount: number;
-		onLogged: () => void;
+		onLogged: () => void | Promise<void>;
 	}
 
 	let { lastEvent, todayCount, onLogged }: Props = $props();
 
 	let loading = $state(false);
+	let undoing = $state(false);
 	let showOptions = $state(false);
 	let pendingId = $state<number | null>(null);
 	let selectedSide = $state<NursingMeta['side']>('equal');
@@ -59,6 +60,17 @@
 		pendingId = null;
 		selectedSide = 'equal';
 	}
+
+	async function undoLast() {
+		if (!lastEvent) return;
+		undoing = true;
+		try {
+			await fetch(`/api/events/${lastEvent.id}`, { method: 'DELETE' });
+			await onLogged();
+		} finally {
+			undoing = false;
+		}
+	}
 </script>
 
 <TrackerCard title="Nursing" icon="🍼" color="#f0a0b0" {lastEvent} lastEventLabel={lastLabel()}>
@@ -90,13 +102,25 @@
 			</button>
 		</div>
 	{:else}
-		<button
-			class="w-full py-4 rounded-xl bg-baby-pink text-white text-lg font-semibold
-				active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
-			onclick={logNursing}
-			disabled={loading}
-		>
-			{loading ? 'Logging...' : 'Nursed Baby'}
-		</button>
+		<div class="flex gap-2">
+			<button
+				class="flex-1 py-4 rounded-xl bg-baby-pink text-white text-lg font-semibold
+					active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
+				onclick={logNursing}
+				disabled={loading}
+			>
+				{loading ? 'Logging...' : 'Nursed Baby'}
+			</button>
+			{#if lastEvent}
+				<button
+					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
+						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					onclick={undoLast}
+					disabled={undoing}
+				>
+					{undoing ? '...' : 'Undo'}
+				</button>
+			{/if}
+		</div>
 	{/if}
 </TrackerCard>
