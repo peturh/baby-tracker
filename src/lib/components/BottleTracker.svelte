@@ -5,12 +5,24 @@
 	interface Props {
 		lastEvent: TrackerEvent | null;
 		todaySessions: TrackerEvent[];
-		onLogged: () => void;
+		onLogged: () => void | Promise<void>;
 	}
 
 	let { lastEvent, todaySessions, onLogged }: Props = $props();
 
 	let loading = $state(false);
+	let undoing = $state(false);
+
+	async function undoLast() {
+		if (!lastEvent) return;
+		undoing = true;
+		try {
+			await fetch(`/api/events/${lastEvent.id}`, { method: 'DELETE' });
+			await onLogged();
+		} finally {
+			undoing = false;
+		}
+	}
 
 	let todayTotals = $derived.by(() => {
 		let total = 0;
@@ -116,13 +128,25 @@
 			</button>
 		</div>
 	{:else}
-		<button
-			class="w-full py-4 rounded-xl bg-baby-orange text-white text-lg font-semibold
-				active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
-			onclick={logBottle}
-			disabled={loading}
-		>
-			{loading ? 'Logging...' : 'Fed Bottle'}
-		</button>
+		<div class="flex gap-2">
+			<button
+				class="flex-1 py-4 rounded-xl bg-baby-orange text-white text-lg font-semibold
+					active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
+				onclick={logBottle}
+				disabled={loading}
+			>
+				{loading ? 'Logging...' : 'Fed Bottle'}
+			</button>
+			{#if lastEvent}
+				<button
+					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
+						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					onclick={undoLast}
+					disabled={undoing}
+				>
+					{undoing ? '...' : 'Undo'}
+				</button>
+			{/if}
+		</div>
 	{/if}
 </TrackerCard>

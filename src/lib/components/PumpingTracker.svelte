@@ -5,13 +5,25 @@
 	interface Props {
 		lastEvent: TrackerEvent | null;
 		todaySessions: TrackerEvent[];
-		onLogged: () => void;
+		onLogged: () => void | Promise<void>;
 	}
 
 	let { lastEvent, todaySessions, onLogged }: Props = $props();
 
 	let loading = $state(false);
+	let undoing = $state(false);
 	let showInput = $state(false);
+
+	async function undoLast() {
+		if (!lastEvent) return;
+		undoing = true;
+		try {
+			await fetch(`/api/events/${lastEvent.id}`, { method: 'DELETE' });
+			await onLogged();
+		} finally {
+			undoing = false;
+		}
+	}
 	let pendingId = $state<number | null>(null);
 	let leftMl = $state(30);
 	let rightMl = $state(30);
@@ -146,13 +158,25 @@
 			</button>
 		</div>
 	{:else}
-		<button
-			class="w-full py-4 rounded-xl bg-baby-green text-white text-lg font-semibold
-				active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
-			onclick={logPumping}
-			disabled={loading}
-		>
-			{loading ? 'Logging...' : 'Used Pump'}
-		</button>
+		<div class="flex gap-2">
+			<button
+				class="flex-1 py-4 rounded-xl bg-baby-green text-white text-lg font-semibold
+					active:scale-95 transition-transform shadow-md hover:shadow-lg disabled:opacity-50"
+				onclick={logPumping}
+				disabled={loading}
+			>
+				{loading ? 'Logging...' : 'Used Pump'}
+			</button>
+			{#if lastEvent}
+				<button
+					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
+						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					onclick={undoLast}
+					disabled={undoing}
+				>
+					{undoing ? '...' : 'Undo'}
+				</button>
+			{/if}
+		</div>
 	{/if}
 </TrackerCard>
