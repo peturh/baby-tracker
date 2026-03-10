@@ -103,32 +103,6 @@
 		saveOrder();
 	}
 
-	function handleTouchStart(i: number, e: TouchEvent) {
-		dragIndex = i;
-		e.preventDefault();
-	}
-
-	function handleTouchMove(e: TouchEvent) {
-		if (dragIndex === null) return;
-		e.preventDefault();
-		const touch = e.touches[0];
-		const el = document.elementFromPoint(touch.clientX, touch.clientY);
-		if (!el) return;
-		const item = el.closest('[data-reorder-index]') as HTMLElement | null;
-		if (!item) return;
-		const targetIndex = parseInt(item.dataset.reorderIndex!);
-		if (isNaN(targetIndex) || targetIndex === dragIndex) return;
-		const arr = [...sectionOrder];
-		const [moved] = arr.splice(dragIndex, 1);
-		arr.splice(targetIndex, 0, moved);
-		sectionOrder = arr;
-		dragIndex = targetIndex;
-	}
-
-	function handleTouchEnd() {
-		dragIndex = null;
-		saveOrder();
-	}
 
 	const sectionLabels: Record<string, string> = {
 		diaper: '🧷 Diaper',
@@ -214,12 +188,7 @@
 				<div class="px-5 pt-4 pb-2">
 					<p class="text-sm font-medium text-gray-500">Reorder or hide sections</p>
 				</div>
-				<div
-					class="px-3 pb-3 space-y-1"
-					ontouchmove={handleTouchMove}
-					ontouchend={handleTouchEnd}
-					role="list"
-				>
+				<div class="px-3 pb-3 space-y-1" role="list">
 					{#each sectionOrder as section, i (section)}
 						<div
 							class="flex items-center gap-2 px-3 py-3 rounded-xl transition-colors
@@ -229,7 +198,6 @@
 							ondragstart={() => handleDragStart(i)}
 							ondragover={(e) => handleDragOver(e, i)}
 							ondragend={handleDragEnd}
-							ontouchstart={(e) => handleTouchStart(i, e)}
 							role="listitem"
 						>
 						<span class="text-gray-300 cursor-grab active:cursor-grabbing select-none text-lg">⠿</span>
