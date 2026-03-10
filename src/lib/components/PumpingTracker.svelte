@@ -12,13 +12,16 @@
 	let loading = $state(false);
 	let showInput = $state(false);
 	let pendingId = $state<number | null>(null);
-	let amountMl = $state(60);
+	let leftMl = $state(30);
+	let rightMl = $state(30);
+
+	let totalMl = $derived(leftMl + rightMl);
 
 	function lastLabel(): string {
 		if (!lastEvent) return '';
 		try {
 			const meta: PumpingMeta = JSON.parse(lastEvent.metadata);
-			return `${meta.amount_ml} ml`;
+			return `${meta.left_ml + meta.right_ml} ml (L${meta.left_ml} / R${meta.right_ml})`;
 		} catch {
 			return '';
 		}
@@ -30,7 +33,7 @@
 			const res = await fetch('/api/events', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ type: 'pumping', metadata: { amount_ml: amountMl } })
+				body: JSON.stringify({ type: 'pumping', metadata: { left_ml: leftMl, right_ml: rightMl } })
 			});
 			const event = await res.json();
 			pendingId = event.id;
@@ -41,12 +44,12 @@
 		}
 	}
 
-	async function updateAmount() {
+	async function save() {
 		if (pendingId) {
 			await fetch(`/api/events/${pendingId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ metadata: { amount_ml: amountMl } })
+				body: JSON.stringify({ metadata: { left_ml: leftMl, right_ml: rightMl } })
 			});
 			onLogged();
 		}
@@ -54,45 +57,55 @@
 		pendingId = null;
 	}
 
-	function adjustAmount(delta: number) {
-		amountMl = Math.max(0, amountMl + delta);
+	function adjust(side: 'left' | 'right', delta: number) {
+		if (side === 'left') leftMl = Math.max(0, leftMl + delta);
+		else rightMl = Math.max(0, rightMl + delta);
 	}
 </script>
 
 <TrackerCard title="Pumping" icon="🥛" color="#7bc67e" {lastEvent} lastEventLabel={lastLabel()}>
 	{#if showInput}
 		<div class="space-y-3">
-			<div class="flex items-center justify-center gap-4">
-				<button
-					class="w-12 h-12 rounded-full bg-gray-100 text-xl font-bold text-gray-600
-						active:bg-gray-200 transition-colors"
-					onclick={() => adjustAmount(-10)}
-				>
-					−
-				</button>
-				<div class="text-center">
-					<input
-						type="number"
-						bind:value={amountMl}
-						class="w-20 text-center text-3xl font-bold text-gray-800 border-b-2 border-baby-green
-							focus:outline-none bg-transparent"
-						min="0"
-						step="5"
-					/>
-					<p class="text-sm text-gray-400 mt-1">ml</p>
-				</div>
-				<button
-					class="w-12 h-12 rounded-full bg-gray-100 text-xl font-bold text-gray-600
-						active:bg-gray-200 transition-colors"
-					onclick={() => adjustAmount(10)}
-				>
-					+
-				</button>
+			<div class="flex gap-3">
+				{#each ['left', 'right'] as side}
+					{@const val = side === 'left' ? leftMl : rightMl}
+					<div class="flex-1">
+						<p class="text-xs text-gray-400 font-medium text-center mb-1">
+							{side === 'left' ? '⬅️ Left' : '➡️ Right'}
+						</p>
+						<div class="flex items-center justify-center gap-2">
+							<button
+								class="w-9 h-9 rounded-full bg-gray-100 text-base font-bold text-gray-600
+									active:bg-gray-200 transition-colors"
+								onclick={() => adjust(side as 'left' | 'right', -10)}
+							>−</button>
+							<input
+								type="number"
+								value={val}
+								oninput={(e) => {
+									const v = Math.max(0, parseInt(e.currentTarget.value) || 0);
+									if (side === 'left') leftMl = v; else rightMl = v;
+								}}
+								class="w-14 text-center text-xl font-bold text-gray-800 border-b-2 border-baby-green
+									focus:outline-none bg-transparent"
+								min="0"
+								step="5"
+							/>
+							<button
+								class="w-9 h-9 rounded-full bg-gray-100 text-base font-bold text-gray-600
+									active:bg-gray-200 transition-colors"
+								onclick={() => adjust(side as 'left' | 'right', 10)}
+							>+</button>
+						</div>
+						<p class="text-xs text-gray-400 text-center mt-0.5">ml</p>
+					</div>
+				{/each}
 			</div>
+			<p class="text-center text-sm font-semibold text-gray-500">Total: {totalMl} ml</p>
 			<button
 				class="w-full py-3 rounded-xl bg-baby-green text-white font-semibold
 					active:scale-95 transition-transform"
-				onclick={updateAmount}
+				onclick={save}
 			>
 				Save
 			</button>

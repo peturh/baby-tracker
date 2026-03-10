@@ -19,4 +19,12 @@ export async function initDb() {
 		CREATE INDEX IF NOT EXISTS idx_events_type_created
 		ON events (type, created_at DESC)
 	`);
+	await db.execute(`
+		CREATE TABLE IF NOT EXISTS appointments (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			datetime TEXT NOT NULL,
+			location TEXT NOT NULL,
+			purpose TEXT NOT NULL DEFAULT ''
+		)
+	`);
 }

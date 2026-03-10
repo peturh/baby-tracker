@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
 	const { type, metadata } = body;
 
-	if (!type || !['diaper', 'nursing', 'pumping', 'sleep'].includes(type)) {
+	if (!type || !['diaper', 'nursing', 'pumping', 'sleep', 'bottle', 'vitamind', 'tummytime'].includes(type)) {
 		return json({ error: 'Invalid event type' }, { status: 400 });
 	}
 
