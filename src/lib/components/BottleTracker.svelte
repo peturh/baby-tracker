@@ -4,12 +4,24 @@
 
 	interface Props {
 		lastEvent: TrackerEvent | null;
+		todaySessions: TrackerEvent[];
 		onLogged: () => void;
 	}
 
-	let { lastEvent, onLogged }: Props = $props();
+	let { lastEvent, todaySessions, onLogged }: Props = $props();
 
 	let loading = $state(false);
+
+	let todayTotals = $derived.by(() => {
+		let total = 0;
+		for (const s of todaySessions) {
+			try {
+				const meta: BottleMeta = JSON.parse(s.metadata);
+				total += meta.amount_ml;
+			} catch { /* ignore */ }
+		}
+		return { total, count: todaySessions.length };
+	});
 	let showInput = $state(false);
 	let pendingId = $state<number | null>(null);
 	let amountMl = $state(60);
@@ -60,6 +72,12 @@
 </script>
 
 <TrackerCard title="Bottle" icon="🍼" color="#f0a060" {lastEvent} lastEventLabel={lastLabel()}>
+	{#if todayTotals.count > 0}
+		<div class="flex items-center justify-between mb-3 px-1">
+			<span class="text-xs text-gray-400">Today ({todayTotals.count} bottle{todayTotals.count !== 1 ? 's' : ''})</span>
+			<span class="text-sm font-bold text-baby-orange">{todayTotals.total} ml</span>
+		</div>
+	{/if}
 	{#if showInput}
 		<div class="space-y-3">
 			<div class="flex items-center justify-center gap-4">

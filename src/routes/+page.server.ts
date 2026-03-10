@@ -7,7 +7,7 @@ export const load: PageServerLoad = async () => {
 	const todayStart = new Date();
 	todayStart.setHours(0, 0, 0, 0);
 
-	const todayTypes = ['tummytime', 'diaper', 'nursing', 'pumping'] as const;
+	const todayTypes = ['tummytime', 'diaper', 'nursing', 'pumping', 'bottle'] as const;
 
 	const [eventResults, appointmentsResult, ...todayResults] = await Promise.all([
 		Promise.all(

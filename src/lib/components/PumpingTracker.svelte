@@ -22,9 +22,14 @@
 		let left = 0, right = 0;
 		for (const s of todaySessions) {
 			try {
-				const meta: PumpingMeta = JSON.parse(s.metadata);
-				left += meta.left_ml;
-				right += meta.right_ml;
+				const meta = JSON.parse(s.metadata);
+				if ('left_ml' in meta) {
+					left += meta.left_ml ?? 0;
+					right += meta.right_ml ?? 0;
+				} else if ('amount_ml' in meta) {
+					left += Math.round((meta.amount_ml ?? 0) / 2);
+					right += Math.round((meta.amount_ml ?? 0) / 2);
+				}
 			} catch { /* ignore */ }
 		}
 		return { left, right, total: left + right, count: todaySessions.length };
@@ -33,8 +38,13 @@
 	function lastLabel(): string {
 		if (!lastEvent) return '';
 		try {
-			const meta: PumpingMeta = JSON.parse(lastEvent.metadata);
-			return `${meta.left_ml + meta.right_ml} ml (L${meta.left_ml} / R${meta.right_ml})`;
+			const meta = JSON.parse(lastEvent.metadata);
+			if ('left_ml' in meta) {
+				return `${meta.left_ml + meta.right_ml} ml (L${meta.left_ml} / R${meta.right_ml})`;
+			} else if ('amount_ml' in meta) {
+				return `${meta.amount_ml} ml`;
+			}
+			return '';
 		} catch {
 			return '';
 		}

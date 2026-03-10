@@ -161,7 +161,8 @@
 			tummytime: [],
 			diaper: [],
 			nursing: [],
-			pumping: []
+			pumping: [],
+			bottle: []
 		};
 
 		for (const event of events) {
@@ -284,7 +285,7 @@
 			{:else if section === 'nursing'}
 				<NursingTracker lastEvent={latest.nursing} todayCount={todayEvents.nursing?.length ?? 0} onLogged={refresh} />
 			{:else if section === 'bottle'}
-				<BottleTracker lastEvent={latest.bottle} onLogged={refresh} />
+				<BottleTracker lastEvent={latest.bottle} todaySessions={todayEvents.bottle ?? []} onLogged={refresh} />
 			{:else if section === 'pumping'}
 				<PumpingTracker lastEvent={latest.pumping} todaySessions={todayEvents.pumping ?? []} onLogged={refresh} />
 			{:else if section === 'sleep'}
