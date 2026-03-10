@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@theme {
+	--color-baby-blue: #6bb7e0;
+	--color-baby-pink: #f0a0b0;
+	--color-baby-green: #7bc67e;
+	--color-baby-yellow: #f5d76e;
+	--color-baby-purple: #b8a0d8;
+	--color-card: #ffffff;
+	--color-bg: #f3f4f6;
+	--color-muted: #6b7280;
+}
+
+html {
+	font-family: system-ui, -apple-system, sans-serif;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	background-color: var(--color-bg);
+}
