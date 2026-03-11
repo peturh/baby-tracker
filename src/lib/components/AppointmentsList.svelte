@@ -48,7 +48,10 @@
 	function formatDate(dt: string): string {
 		const d = new Date(dt);
 		const now = new Date();
-		const diffDays = Math.floor((d.getTime() - now.getTime()) / 86_400_000);
+
+		const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+		const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		const diffDays = Math.round((dDay.getTime() - nowDay.getTime()) / 86_400_000);
 
 		const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 		const date = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });

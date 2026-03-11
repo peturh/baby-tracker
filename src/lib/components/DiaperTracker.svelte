@@ -14,7 +14,7 @@
 	let undoing = $state(false);
 	let showOptions = $state(false);
 	let pendingId = $state<number | null>(null);
-	let selectedType = $state<DiaperMeta['subtype']>('pee');
+	let selectedType = $state<DiaperMeta['subtype']>('mixed');
 
 	function lastLabel(): string {
 		if (!lastEvent) return '';
@@ -58,7 +58,7 @@
 	function dismiss() {
 		showOptions = false;
 		pendingId = null;
-		selectedType = 'pee';
+		selectedType = 'mixed';
 	}
 
 	async function undoLast() {
