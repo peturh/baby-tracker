@@ -62,18 +62,18 @@
 	}
 </script>
 
-<div class="rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden">
+<div class="rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
 	<div class="px-5 pt-4 pb-3 flex items-center justify-between">
 		<div class="flex items-center gap-2.5">
 			<span class="text-2xl">📅</span>
-			<h2 class="text-lg font-semibold text-gray-800">Appointments</h2>
+			<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Appointments</h2>
 		</div>
 		{#if appointments.length > 0}
 			<p class="text-sm font-medium text-baby-orange">
 				{appointments.length} upcoming
 			</p>
 		{:else}
-			<p class="text-sm text-gray-400">None scheduled</p>
+			<p class="text-sm text-gray-400 dark:text-gray-500">None scheduled</p>
 		{/if}
 	</div>
 
@@ -81,17 +81,17 @@
 		{#if appointments.length > 0}
 			<div class="space-y-2">
 				{#each appointments as apt (apt.id)}
-					<div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-gray-50">
+					<div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-700/50">
 						<div class="min-w-0 flex-1">
-							<p class="text-sm font-semibold text-gray-700">{formatDate(apt.datetime)}</p>
-							<p class="text-sm text-gray-500">{apt.location}</p>
+							<p class="text-sm font-semibold text-gray-700 dark:text-gray-200">{formatDate(apt.datetime)}</p>
+							<p class="text-sm text-gray-500 dark:text-gray-400">{apt.location}</p>
 							{#if apt.purpose}
-								<p class="text-xs text-gray-400 mt-0.5">{apt.purpose}</p>
+								<p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{apt.purpose}</p>
 							{/if}
 						</div>
 						<button
 							class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
-								text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors"
+								text-gray-300 dark:text-gray-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
 							onclick={() => deleteAppointment(apt.id)}
 							aria-label="Delete appointment"
 						>
@@ -107,22 +107,22 @@
 				<input
 					type="datetime-local"
 					bind:value={datetime}
-					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 text-gray-800
-						text-sm focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200"
+					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-100
+						text-sm focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200 dark:border-gray-600"
 				/>
 				<input
 					type="text"
 					bind:value={location}
 					placeholder="Location"
-					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 text-gray-800
-						text-sm placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200"
+					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-100
+						text-sm placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200 dark:border-gray-600"
 				/>
 				<input
 					type="text"
 					bind:value={purpose}
 					placeholder="Purpose (optional)"
-					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 text-gray-800
-						text-sm placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200"
+					class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-100
+						text-sm placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-baby-orange border border-gray-200 dark:border-gray-600"
 				/>
 				<div class="flex gap-2">
 					<button
@@ -135,7 +135,7 @@
 					</button>
 					<button
 						type="button"
-						class="py-3 px-4 rounded-xl text-sm text-gray-400 hover:text-gray-600"
+						class="py-3 px-4 rounded-xl text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
 						onclick={() => (showForm = false)}
 					>
 						Cancel

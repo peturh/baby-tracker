@@ -73,10 +73,10 @@
 	}
 </script>
 
-<TrackerCard title="Nursing" icon="🍼" color="#f0a0b0" {lastEvent} lastEventLabel={lastLabel()}>
+<TrackerCard title="Nursing" icon="🤱" color="#f0a0b0" {lastEvent} lastEventLabel={lastLabel()}>
 	{#if todayCount > 0}
 		<div class="flex items-center justify-between mb-3 px-1">
-			<span class="text-xs text-gray-400">Today</span>
+			<span class="text-xs text-gray-400 dark:text-gray-500">Today</span>
 			<span class="text-sm font-bold text-baby-pink">{todayCount} feeding{todayCount !== 1 ? 's' : ''}</span>
 		</div>
 	{/if}
@@ -87,7 +87,7 @@
 					<button
 						class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all {selectedSide === side
 							? 'bg-baby-pink text-white shadow-md scale-105'
-							: 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+							: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}"
 						onclick={() => updateSide(side as NursingMeta['side'])}
 					>
 						{side === 'left' ? '⬅️ Left' : side === 'right' ? '➡️ Right' : '⚖️ Equal'}
@@ -95,7 +95,7 @@
 				{/each}
 			</div>
 			<button
-				class="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+				class="w-full py-2 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
 				onclick={dismiss}
 			>
 				Done
@@ -113,8 +113,8 @@
 			</button>
 			{#if lastEvent}
 				<button
-					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
-						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					class="px-4 py-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm text-gray-400 dark:text-gray-500 font-medium
+						hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
 					onclick={undoLast}
 					disabled={undoing}
 				>

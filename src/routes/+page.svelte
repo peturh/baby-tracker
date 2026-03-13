@@ -12,6 +12,39 @@
 
 	let { data } = $props();
 
+	const THEME_KEY = 'baby-tracker-theme';
+	type ThemeMode = 'system' | 'light' | 'dark';
+	let themeMode = $state<ThemeMode>('system');
+
+	if (browser) {
+		themeMode = (localStorage.getItem(THEME_KEY) as ThemeMode) || 'system';
+	}
+
+	function applyTheme(mode: ThemeMode) {
+		if (!browser) return;
+		const isDark =
+			mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		document.documentElement.classList.toggle('dark', isDark);
+		const metaTheme = document.querySelector('meta[name="theme-color"]');
+		if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0a0a0f' : '#6bb7e0');
+	}
+
+	function cycleTheme() {
+		const order: ThemeMode[] = ['system', 'light', 'dark'];
+		themeMode = order[(order.indexOf(themeMode) + 1) % 3];
+		localStorage.setItem(THEME_KEY, themeMode);
+		applyTheme(themeMode);
+	}
+
+	$effect(() => {
+		if (!browser) return;
+		applyTheme(themeMode);
+		const mq = window.matchMedia('(prefers-color-scheme: dark)');
+		const handler = () => { if (themeMode === 'system') applyTheme('system'); };
+		mq.addEventListener('change', handler);
+		return () => mq.removeEventListener('change', handler);
+	});
+
 	let localLatest = $state<Record<string, TrackerEvent | null> | null>(null);
 	let latest = $derived(localLatest ?? (data.latest as Record<string, TrackerEvent | null>));
 
@@ -106,7 +139,7 @@
 
 	const sectionLabels: Record<string, string> = {
 		diaper: '🧷 Diaper',
-		nursing: '🍼 Nursing',
+		nursing: '🤱 Nursing',
 		bottle: '🍼 Bottle',
 		pumping: '🥛 Pumping',
 		sleep: '😴 Sleep',
@@ -163,14 +196,41 @@
 	<meta name="description" content="Track baby activities" />
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 pb-8">
-	<header class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-5 py-3 flex items-center justify-center">
-		<h1 class="text-xl font-bold text-gray-800">
+<div class="min-h-screen bg-gray-50 dark:bg-[#0a0a0f] pb-8 transition-colors">
+	<header class="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 px-5 py-3 flex items-center justify-center">
+		<button
+			class="absolute left-4 w-9 h-9 flex items-center justify-center rounded-lg
+				text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+			onclick={cycleTheme}
+			aria-label="Toggle theme: {themeMode}"
+			title={themeMode === 'system' ? 'Theme: System' : themeMode === 'light' ? 'Theme: Light' : 'Theme: Dark'}
+		>
+			{#if themeMode === 'system'}
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+				</svg>
+			{:else if themeMode === 'light'}
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+					<line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+				</svg>
+			{:else}
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+				</svg>
+			{/if}
+		</button>
+		<h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">
 			👶 Baby Tracker
 		</h1>
 		<button
 			class="absolute right-4 w-9 h-9 flex items-center justify-center rounded-lg
-				transition-colors {editingOrder ? 'bg-baby-blue text-white' : 'text-gray-400 hover:text-gray-600'}"
+				transition-colors {editingOrder ? 'bg-baby-blue text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}"
 			onclick={() => (editingOrder = !editingOrder)}
 			aria-label="Reorder sections"
 		>
@@ -184,15 +244,15 @@
 
 	{#if editingOrder}
 		<div class="max-w-lg mx-auto px-4 pt-4 pb-2">
-			<div class="rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden">
+			<div class="rounded-2xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
 				<div class="px-5 pt-4 pb-2">
-					<p class="text-sm font-medium text-gray-500">Reorder or hide sections</p>
+					<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Reorder or hide sections</p>
 				</div>
 				<div class="px-3 pb-3 space-y-1" role="list">
 					{#each sectionOrder as section, i (section)}
 						<div
 							class="flex items-center gap-2 px-3 py-3 rounded-xl transition-colors
-								{dragIndex === i ? 'bg-baby-blue/10 scale-[1.02]' : 'bg-gray-50'}"
+								{dragIndex === i ? 'bg-baby-blue/10 scale-[1.02]' : 'bg-gray-50 dark:bg-gray-700/50'}"
 							draggable="true"
 							data-reorder-index={i}
 							ondragstart={() => handleDragStart(i)}
@@ -200,13 +260,13 @@
 							ondragend={handleDragEnd}
 							role="listitem"
 						>
-						<span class="text-gray-300 cursor-grab active:cursor-grabbing select-none text-lg">⠿</span>
-						<span class="flex-1 text-sm font-medium {hiddenSections.has(section) ? 'text-gray-300 line-through' : 'text-gray-700'}">
+						<span class="text-gray-300 dark:text-gray-600 cursor-grab active:cursor-grabbing select-none text-lg">⠿</span>
+						<span class="flex-1 text-sm font-medium {hiddenSections.has(section) ? 'text-gray-300 dark:text-gray-600 line-through' : 'text-gray-700 dark:text-gray-200'}">
 							{sectionLabels[section]}
 						</span>
 						<button
 							class="w-8 h-8 flex items-center justify-center rounded-lg transition-colors
-								{hiddenSections.has(section) ? 'text-gray-300 hover:text-gray-500' : 'text-baby-blue hover:bg-blue-50'}"
+								{hiddenSections.has(section) ? 'text-gray-300 dark:text-gray-600 hover:text-gray-500' : 'text-baby-blue hover:bg-blue-50 dark:hover:bg-blue-900/30'}"
 							onclick={() => toggleVisibility(section)}
 							aria-label="{hiddenSections.has(section) ? 'Show' : 'Hide'} {section}"
 						>
@@ -226,15 +286,15 @@
 							{/if}
 						</button>
 						<button
-							class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400
-								hover:text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-20"
+							class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-gray-500
+								hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-20"
 							onclick={() => moveUp(i)}
 							disabled={i === 0}
 							aria-label="Move up"
 						>&#9650;</button>
 						<button
-							class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400
-								hover:text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-20"
+							class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-gray-500
+								hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-20"
 							onclick={() => moveDown(i)}
 							disabled={i === sectionOrder.length - 1}
 							aria-label="Move down"

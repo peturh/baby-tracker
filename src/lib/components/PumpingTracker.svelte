@@ -102,10 +102,10 @@
 	{#if todayTotals.count > 0}
 		<div class="mb-3 px-1 space-y-1">
 			<div class="flex items-center justify-between">
-				<span class="text-xs text-gray-400">Today ({todayTotals.count} session{todayTotals.count !== 1 ? 's' : ''})</span>
+				<span class="text-xs text-gray-400 dark:text-gray-500">Today ({todayTotals.count} session{todayTotals.count !== 1 ? 's' : ''})</span>
 				<span class="text-sm font-bold text-baby-green">{todayTotals.total} ml</span>
 			</div>
-			<div class="flex gap-3 text-xs text-gray-400">
+			<div class="flex gap-3 text-xs text-gray-400 dark:text-gray-500">
 				<span>L: {todayTotals.left} ml</span>
 				<span>R: {todayTotals.right} ml</span>
 			</div>
@@ -117,13 +117,13 @@
 				{#each ['left', 'right'] as side}
 					{@const val = side === 'left' ? leftMl : rightMl}
 					<div class="flex-1">
-						<p class="text-xs text-gray-400 font-medium text-center mb-1">
+						<p class="text-xs text-gray-400 dark:text-gray-500 font-medium text-center mb-1">
 							{side === 'left' ? '⬅️ Left' : '➡️ Right'}
 						</p>
 						<div class="flex items-center justify-center gap-2">
 							<button
-								class="w-9 h-9 rounded-full bg-gray-100 text-base font-bold text-gray-600
-									active:bg-gray-200 transition-colors"
+								class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-base font-bold text-gray-600 dark:text-gray-300
+									active:bg-gray-200 dark:active:bg-gray-600 transition-colors"
 								onclick={() => adjust(side as 'left' | 'right', -10)}
 							>−</button>
 							<input
@@ -133,22 +133,22 @@
 									const v = Math.max(0, parseInt(e.currentTarget.value) || 0);
 									if (side === 'left') leftMl = v; else rightMl = v;
 								}}
-								class="w-14 text-center text-xl font-bold text-gray-800 border-b-2 border-baby-green
+								class="w-14 text-center text-xl font-bold text-gray-800 dark:text-gray-100 border-b-2 border-baby-green
 									focus:outline-none bg-transparent"
 								min="0"
 								step="5"
 							/>
 							<button
-								class="w-9 h-9 rounded-full bg-gray-100 text-base font-bold text-gray-600
-									active:bg-gray-200 transition-colors"
+								class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-base font-bold text-gray-600 dark:text-gray-300
+									active:bg-gray-200 dark:active:bg-gray-600 transition-colors"
 								onclick={() => adjust(side as 'left' | 'right', 10)}
 							>+</button>
 						</div>
-						<p class="text-xs text-gray-400 text-center mt-0.5">ml</p>
+						<p class="text-xs text-gray-400 dark:text-gray-500 text-center mt-0.5">ml</p>
 					</div>
 				{/each}
 			</div>
-			<p class="text-center text-sm font-semibold text-gray-500">Total: {totalMl} ml</p>
+			<p class="text-center text-sm font-semibold text-gray-500 dark:text-gray-400">Total: {totalMl} ml</p>
 			<button
 				class="w-full py-3 rounded-xl bg-baby-green text-white font-semibold
 					active:scale-95 transition-transform"
@@ -169,8 +169,8 @@
 			</button>
 			{#if lastEvent}
 				<button
-					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
-						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					class="px-4 py-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm text-gray-400 dark:text-gray-500 font-medium
+						hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
 					onclick={undoLast}
 					disabled={undoing}
 				>

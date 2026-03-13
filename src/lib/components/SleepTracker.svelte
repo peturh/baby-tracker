@@ -72,20 +72,20 @@
 		<div class="space-y-3">
 			<div class="flex gap-3">
 				<label class="flex-1">
-					<span class="block text-xs text-gray-400 mb-1 font-medium">From</span>
+					<span class="block text-xs text-gray-400 dark:text-gray-500 mb-1 font-medium">From</span>
 					<input
 						type="time"
 						bind:value={startTime}
-						class="w-full px-3 py-2.5 rounded-xl bg-gray-100 text-gray-800 text-center
+						class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-center
 							text-lg font-medium focus:outline-none focus:ring-2 focus:ring-baby-purple"
 					/>
 				</label>
 				<label class="flex-1">
-					<span class="block text-xs text-gray-400 mb-1 font-medium">To</span>
+					<span class="block text-xs text-gray-400 dark:text-gray-500 mb-1 font-medium">To</span>
 					<input
 						type="time"
 						bind:value={endTime}
-						class="w-full px-3 py-2.5 rounded-xl bg-gray-100 text-gray-800 text-center
+						class="w-full px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-center
 							text-lg font-medium focus:outline-none focus:ring-2 focus:ring-baby-purple"
 					/>
 				</label>
@@ -94,7 +94,7 @@
 				<button
 					class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all {period === 'day'
 						? 'bg-baby-yellow text-white shadow-md'
-						: 'bg-gray-100 text-gray-600'}"
+						: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}"
 					onclick={() => (period = 'day')}
 				>
 					☀️ Day nap
@@ -102,7 +102,7 @@
 				<button
 					class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all {period === 'night'
 						? 'bg-baby-purple text-white shadow-md'
-						: 'bg-gray-100 text-gray-600'}"
+						: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}"
 					onclick={() => (period = 'night')}
 				>
 					🌙 Night
@@ -118,7 +118,7 @@
 					{loading ? 'Saving...' : 'Save'}
 				</button>
 				<button
-					class="py-3 px-4 rounded-xl text-sm text-gray-400 hover:text-gray-600"
+					class="py-3 px-4 rounded-xl text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
 					onclick={() => (showForm = false)}
 				>
 					Cancel
@@ -136,8 +136,8 @@
 			</button>
 			{#if lastEvent}
 				<button
-					class="px-4 py-4 rounded-xl bg-gray-100 text-sm text-gray-400 font-medium
-						hover:text-red-400 hover:bg-red-50 transition-colors disabled:opacity-50"
+					class="px-4 py-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-sm text-gray-400 dark:text-gray-500 font-medium
+						hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
 					onclick={undoLast}
 					disabled={undoing}
 				>

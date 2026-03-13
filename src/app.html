@@ -3,12 +3,22 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-		<meta name="theme-color" content="#6bb7e0" />
+		<meta name="theme-color" content="#6bb7e0" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 		<link rel="manifest" href="/manifest.json" />
 		<link rel="icon" href="/favicon.png" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<script>
+			(function() {
+				var t = localStorage.getItem('baby-tracker-theme');
+				var d = (!t || t === 'system')
+					? window.matchMedia('(prefers-color-scheme: dark)').matches
+					: t === 'dark';
+				if (d) document.documentElement.classList.add('dark');
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

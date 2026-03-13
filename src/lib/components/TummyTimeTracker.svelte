@@ -91,10 +91,10 @@
 	{#if running}
 		<div class="space-y-3">
 			<div class="text-center">
-				<p class="text-4xl font-bold text-gray-800 tabular-nums">
+				<p class="text-4xl font-bold text-gray-800 dark:text-gray-100 tabular-nums">
 					{formatDuration(elapsed)}
 				</p>
-				<p class="text-sm text-gray-400 mt-1">Timer running</p>
+				<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Timer running</p>
 			</div>
 			<button
 				class="w-full py-4 rounded-xl bg-red-400 text-white text-lg font-semibold
@@ -115,7 +115,7 @@
 				{/each}
 			</div>
 			<div class="flex items-center justify-between mb-3 px-1">
-				<span class="text-xs text-gray-400">Today's total</span>
+				<span class="text-xs text-gray-400 dark:text-gray-500">Today's total</span>
 				<span class="text-sm font-bold text-baby-teal">{formatDuration(todayTotal)}</span>
 			</div>
 		{/if}
